@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+#
+# Matthew Giarra
+# matthew.giarra@gmail.com
+# First commit 2020-05-03
+#
 
 import argparse
 from time import sleep
