@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import argparse
 from time import sleep
 from picamera import PiCamera
@@ -8,6 +10,9 @@ import pdb
 # This function converts a formatted string to a datetime object
 def str2date(s):
     return datetime.strptime(s, '%Y-%m-%d-%H-%M-%S') 
+
+def date2str(d):
+    return(d.strftime('%Y-%m-%d %H:%M:%S'))
 
 # This function converts a string to a datetime object 
 # if the string matches a specified format, and errors otherwise
@@ -22,17 +27,20 @@ def valid_date(s):
 # Main function 
 def main():
 
+    # Get the time now
+    nowtime=datetime.now()
+
     # Parse arguments
     parser = argparse.ArgumentParser()
     parser.add_argument('--outdir', '-o', type=str, default='.', help='Directory for saving images' )
-    parser.add_argument('-d', '--duration', type=float, default = 0, 
-            help='Duration of time series in units specified by --unit. Runs forever if unset and --end is unset.')
-    parser.add_argument('-i', '--interval', type=float, default=1,
-            help='Time laps interval in units specified by --unit. Default: 1')
-    parser.add_argument('-u', '--unit', choices = ['hours', 'minutes', 'seconds', 'Hours', 'Minutes', 'Seconds'], 
-            default='seconds', help='Time unit (seconds, hours, or minutes)') 
     parser.add_argument('-s', '--start', type=valid_date, default=nowtime, 
-            help='Start date and time, formatted as YYYY-MM-DD-HH-MM-SS')
+            help='Start date and time, formatted as YYYY-MM-DD-HH-MM-SS (Default: start immediately)')
+    parser.add_argument('-d', '--duration', type=float, default = 0, 
+            help='Duration of time series in units specified by --unit. Runs forever if unset.')
+    parser.add_argument('-i', '--interval', type=float, default=1,
+            help='Time lapse interval in units specified by --unit (Default: 1)')
+    parser.add_argument('-u', '--unit', choices = ['hours', 'minutes', 'seconds', 'Hours', 'Minutes', 'Seconds'], 
+            default='seconds', help='Time unit (seconds, hours, or minutes) (Default: seconds)') 
 
     args, leftovers = parser.parse_known_args()
     outdir = args.outdir
@@ -45,9 +53,6 @@ def main():
     if not(os.path.isdir(outdir)):
             os.makedirs(outdir, exist_ok=True)
 
-    # Get the time now
-    nowtime=datetime.now()
-    
     # Start time in the past so start now
     if date_start < nowtime:
         print('Warning: start time occurs in the past. Starting now.')
